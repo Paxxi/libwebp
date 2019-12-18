@@ -39,3 +39,6 @@ cmake_install.cmake
 /build
 extras/get_disto
 extras/webp_quality
+.project
+.settings/
+build*/

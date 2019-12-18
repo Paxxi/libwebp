@@ -41,12 +41,6 @@ endif()
 set(WEBP_DEP_LIBRARIES)
 set(WEBP_DEP_INCLUDE_DIRS)
 
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release"
-      CACHE "Build type: Release, Debug, MinSizeRel or RelWithDebInfo" STRING
-      FORCE)
-endif()
-
 # Include dependencies.
 include(cmake/deps.cmake)
 include(GNUInstallDirs)
@@ -225,10 +219,14 @@ target_include_directories(webputils
                            PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
                                    ${CMAKE_CURRENT_SOURCE_DIR})
 add_library(webp
-            $<TARGET_OBJECTS:webpdecode>
-            $<TARGET_OBJECTS:webpdsp>
-            $<TARGET_OBJECTS:webpencode>
-            $<TARGET_OBJECTS:webputils>)
+            ${WEBP_DEC_SRCS}
+            ${WEBP_DSP_COMMON_SRCS}
+            ${WEBP_DSP_DEC_SRCS}
+            ${WEBP_DSP_ENC_SRCS}
+            ${WEBP_ENC_SRCS}
+            ${WEBP_UTILS_COMMON_SRCS}
+            ${WEBP_UTILS_DEC_SRCS}
+            ${WEBP_UTILS_ENC_SRCS})
 target_link_libraries(webp ${WEBP_DEP_LIBRARIES})
 target_include_directories(webp
                            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -238,7 +236,13 @@ set_target_properties(
   webp
   PROPERTIES PUBLIC_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/src/webp/decode.h;\
 ${CMAKE_CURRENT_SOURCE_DIR}/src/webp/encode.h;\
-${CMAKE_CURRENT_SOURCE_DIR}/src/webp/types.h")
+${CMAKE_CURRENT_SOURCE_DIR}/src/webp/types.h"
+  COMPILE_PDB_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
+  COMPILE_PDB_NAME webp
+  COMPILE_PDB_NAME_DEBUG webpd
+  PDB_NAME webp
+  PDB_NAME_DEBUG webpd
+)
 
 # Make sure the OBJECT libraries are built with position independent code (it is
 # not ON by default).
@@ -620,6 +624,14 @@ set(ConfigPackageLocation ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/cmake/)
 install(EXPORT ${PROJECT_NAME}Targets
         NAMESPACE ${PROJECT_NAME}::
         DESTINATION ${ConfigPackageLocation})
+install(FILES ${PROJECT_BINARY_DIR}/RelWithDebInfo/webp.pdb
+  DESTINATION lib
+  CONFIGURATIONS RelWithDebInfo
+)
+install(FILES ${PROJECT_BINARY_DIR}/Debug/webpd.pdb
+  DESTINATION lib
+  CONFIGURATIONS Debug
+)
 
 # Create the CMake version file.
 include(CMakePackageConfigHelpers)
