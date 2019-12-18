@@ -320,20 +320,6 @@ string(REGEX MATCH
 # Define the libraries to install.
 list(APPEND INSTALLED_LIBRARIES webpdecoder webp webpdemux)
 
-# Deal with SIMD. Change the compile flags for SIMD files we use.
-list(LENGTH WEBP_SIMD_FILES_TO_INCLUDE WEBP_SIMD_FILES_TO_INCLUDE_LENGTH)
-math(EXPR WEBP_SIMD_FILES_TO_INCLUDE_RANGE
-     "${WEBP_SIMD_FILES_TO_INCLUDE_LENGTH}-1")
-
-foreach(I_FILE RANGE ${WEBP_SIMD_FILES_TO_INCLUDE_RANGE})
-  list(GET WEBP_SIMD_FILES_TO_INCLUDE ${I_FILE} FILE)
-  list(GET WEBP_SIMD_FLAGS_TO_INCLUDE ${I_FILE} SIMD_COMPILE_FLAG)
-  set_source_files_properties(${FILE}
-                              PROPERTIES
-                              COMPILE_FLAGS
-                              ${SIMD_COMPILE_FLAG})
-endforeach()
-
 if(WEBP_BUILD_GIF2WEBP AND NOT GIF_FOUND)
   set(WEBP_BUILD_GIF2WEBP OFF)
 endif()
